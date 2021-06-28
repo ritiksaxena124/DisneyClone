@@ -1,42 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { useParams } from "react-router-dom";
+import db from "../firebase";
+
 const Detail = () => {
+  const { id } = useParams();
+  const [movie, setMovie] = useState();
+  useEffect(() => {
+    //grab the movie info from db
+    db.collection("movies")
+      .doc(id)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          //save movie data
+          setMovie(doc.data());
+        } else {
+          //redirect to home page
+        }
+      });
+  }, [id]);
+
   return (
     <>
       <Container>
-        <Background>
-          <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/4F39B7E16726ECF419DD7C49E011DD95099AA20A962B0B10AA1881A70661CE45/scale?width=1440&aspectRatio=1.78&format=jpeg" />
-        </Background>
+        {movie && (
+          <>
+            <Background>
+              <img src={movie.backgroundImg} alt="" />
+            </Background>
 
-        <ImgTitle>
-          <img src="https://prod-ripcut-delivery.disney-plus.net/v1/variant/disney/D7AEE1F05D10FC37C873176AAA26F777FC1B71E7A6563F36C6B1B497CAB1CEC2/scale?width=1440&aspectRatio=1.78" />
-        </ImgTitle>
+            <ImgTitle>
+              <img src={movie.titleImg} alt="" />
+            </ImgTitle>
 
-        <Controls>
-          <PlayButton>
-            <img src="./images/play-icon-black.png" />
-            <span>PLAY</span>
-          </PlayButton>
-          <TrailerButton>
-            <img src="./images/play-icon-white.png" />
-            <span>TRAILER</span>
-          </TrailerButton>
-          <AddButton>
-            <span>+</span>
-          </AddButton>
-          <GroupButton>
-            <img src="./images/group-icon.png" />
-          </GroupButton>
-        </Controls>
-        <SubTitle>2018 * 7m * Family, Fantasy, Kids, Animation</SubTitle>
-        <Description>
-          Lorem Ipsum is simply dummy text of the printing and typesetting
-          industry. Lorem Ipsum has been the industry's standard dummy text ever
-          since the 1500s, when an unknown printer took a galley of type and
-          scrambled it to make a type specimen book. It has survived not only
-          five centuries, but also the leap into electronic typesetting,
-          remaining essentially unchanged.
-        </Description>
+            <Controls>
+              <PlayButton>
+                <img src="/images/play-icon-black.png" alt="" />
+                <span>PLAY</span>
+              </PlayButton>
+              <TrailerButton>
+                <img src="/images/play-icon-white.png" alt="" />
+                <span>TRAILER</span>
+              </TrailerButton>
+              <AddButton>
+                <span>+</span>
+              </AddButton>
+              <GroupButton>
+                <img src="/images/group-icon.png" alt="" />
+              </GroupButton>
+            </Controls>
+            <SubTitle>{movie.subTitle}</SubTitle>
+            <Description>{movie.description} </Description>
+          </>
+        )}
       </Container>
     </>
   );
@@ -48,6 +65,7 @@ const Container = styled.div`
   min-height: calc(100vh-70px);
   padding: 0 calc(3.5vw + 5px);
   position: relative;
+  margin-top: 60px;
 `;
 
 const Background = styled.div`
@@ -57,7 +75,7 @@ const Background = styled.div`
   right: 0;
   bottom: 0;
   z-index: -1;
-
+  opacity: 0.7;
   img {
     width: 100%;
     height: 100%;
@@ -80,6 +98,7 @@ const ImgTitle = styled.div`
 const Controls = styled.div`
   display: flex;
   align-items: center;
+  margin-top: 25px;
 `;
 const PlayButton = styled.button`
   display: flex;
@@ -118,9 +137,7 @@ const AddButton = styled.button`
     color: #eee;
   }
 `;
-const GroupButton = styled(AddButton)`
-  background: black;
-`;
+const GroupButton = styled(AddButton)``;
 
 const SubTitle = styled.div`
   margin-top: 25px;
@@ -129,7 +146,8 @@ const SubTitle = styled.div`
 `;
 
 const Description = styled.div`
-  font-size: 20px;
+  font-size: 19px;
   color: rgb(249, 249, 249, 0.8);
   margin-top: 15px;
+  max-width: 700px;
 `;
